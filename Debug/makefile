@@ -120,34 +120,34 @@ endif
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXE_OUTPUTS += \
-461_lab5.out \
+461_lab5_scratch.out \
 
 EXE_OUTPUTS__QUOTED += \
-"461_lab5.out" \
+"461_lab5_scratch.out" \
 
 BIN_OUTPUTS += \
-461_lab5.hex \
+461_lab5_scratch.hex \
 
 BIN_OUTPUTS__QUOTED += \
-"461_lab5.hex" \
+"461_lab5_scratch.hex" \
 
 
 # All Target
 all: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
-	@$(MAKE) --no-print-directory -Onone "461_lab5.out"
+	@$(MAKE) --no-print-directory -Onone "461_lab5_scratch.out"
 
 # Tool invocations
-461_lab5.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
+461_lab5_scratch.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: Arm Linker'
-	"/Applications/ti/ccs1011/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"461_lab5.map" --heap_size=0x800 --stack_size=0x800 -i"/Applications/ti/ccs1011/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/lib" -i"/Applications/ti/ccs1011/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="461_lab5_linkInfo.xml" --rom_model -o "461_lab5.out" $(ORDERED_OBJS)
+	"/Applications/ti/ccs1011/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 -me --define=ccs="ccs" --define=PART_TM4C123GH6PM -g --gcc --diag_warning=225 --diag_wrap=off --display_error_number --abi=eabi -z -m"461_lab5_scratch.map" --heap_size=0x800 --stack_size=0x800 -i"/Applications/ti/ccs1011/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/lib" -i"/Applications/ti/ccs1011/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/include" --reread_libs --diag_wrap=off --display_error_number --warn_sections --xml_link_info="461_lab5_scratch_linkInfo.xml" --rom_model -o "461_lab5_scratch.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
-461_lab5.hex: $(EXE_OUTPUTS)
+461_lab5_scratch.hex: $(EXE_OUTPUTS)
 	@echo 'Building secondary target: "$@"'
 	@echo 'Invoking: Arm Hex Utility'
-	"/Applications/ti/ccs1011/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/bin/armhex" --diag_wrap=off -o "461_lab5.hex" $(EXE_OUTPUTS__QUOTED)
+	"/Applications/ti/ccs1011/ccs/tools/compiler/ti-cgt-arm_20.2.5.LTS/bin/armhex" --diag_wrap=off -o "461_lab5_scratch.hex" $(EXE_OUTPUTS__QUOTED)
 	@echo 'Finished building secondary target: "$@"'
 	@echo ' '
 

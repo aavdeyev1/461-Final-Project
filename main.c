@@ -16,7 +16,7 @@ int main(void)
 {
     Disable_Interrupts();
 //    Config_SysTick_Int(0x0030D400);     // 200ms interval
-    Config_SysTick_Int(0xF550C8);       // 1 sec tick
+//    Config_SysTick_Int(0xF550C8);       // 1 sec tick
 //    Config_SysTick_Int(0x1001);     // 200ms interval
     Config_Port_E();
     Config_Timer0A();

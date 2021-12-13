@@ -43,8 +43,7 @@ uint32_t ADC0_InSeq3(void)
   return result;
 }
 
-void SysTick_Handler(void)
-// Can remove highlighted lines because there’s Nested Vectored Interrupts that’ll handle it
+void SysTick_Handler(void)// Can remove highlighted lines because there’s Nested Vectored Interrupts that’ll handle it
 {
     ADC_Sample = ADC0_InSeq3();
     setting = ceil(ADC_Sample / 4.10);
@@ -125,7 +124,7 @@ void Config_Timer0A(void)
     TIMER0_CFG_R = 0x00000000;    // Select 32­bit timer configuration
     TIMER0_TAMR_R = 0x00000002;    // Select periodic mode, count down
     TIMER0_TAPR_R = 0x00;    // Prescale set 0
-    TIMER0_TAILR_R = 0xF550C8;    // Set reload value
+    TIMER0_TAILR_R = 0x1E847FF;    // Set reload value
     TIMER0_IMR_R |= 0x00000001;    // Interrupt enabled
     TIMER0_ICR_R = 0x00000001;    // Clear flags in GPTMRIS and GPTMMIS
     NVIC_PRI4_R = ((NVIC_PRI4_R & 0x00FFFFFF) | 0xA0000000); // INT 19, Priority 5
@@ -257,20 +256,26 @@ void Turn_Motor_Bkwd(int turns)
 {
  int i = 0;
  for(i=1; i <= turns; i++) {
-     GPIO_PORTC_DATA_R = 0x90;  // Bin2: 1, Bin1: 0, Ain2: 0, Ain1: 1
-     Timer1A_delay(0x7D00);
-     GPIO_PORTC_DATA_R = 0x00;  // Bin2: 0, Bin1: 0, Ain2: 0, Ain1: 0
-     GPIO_PORTC_DATA_R = 0xA0;  // Bin2: 1, Bin1: 0, Ain2: 1, Ain1: 0
-     Timer1A_delay(0x7D00);
-     Timer1A_delay(0x7D00);
-     GPIO_PORTC_DATA_R = 0x00;  // Bin2: 0, Bin1: 0, Ain2: 0, Ain1: 0
-     GPIO_PORTC_DATA_R = 0x60;  // Bin2: 0, Bin1: 1, Ain2: 1, Ain1: 0
-     Timer1A_delay(0x7D00);
-     GPIO_PORTC_DATA_R = 0x00;  // Bin2: 0, Bin1: 0, Ain2: 0, Ain1: 0
-     GPIO_PORTC_DATA_R = 0x50;  // Bin2: 0, Bin1: 1, Ain2: 0, Ain1: 1
-     Timer1A_delay(0x7D00);
-     GPIO_PORTC_DATA_R = 0x00;  // Bin2: 0, Bin1: 0, Ain2: 0, Ain1: 0
-     }
+     GPIO_PORTC_DATA_R = 0x90;  // Bin2: 0, Bin1: 1, Ain2: 0, Ain1: 1 3
+           Timer1A_delay(0x7D00);
+     //     Timer1A_delay(0x30D400);
+     //     Timer1A_delay(0xFA0);
+           GPIO_PORTC_DATA_R = 0x00;  // Bin2: 0, Bin1: 0, Ain2: 0, Ain1: 0
+           GPIO_PORTC_DATA_R = 0x50;  // Bin2: 0, Bin1: 1, Ain2: 1, Ain1: 0  3
+           Timer1A_delay(0x7D00);
+     //      Timer1A_delay(0x30D400);
+     //      Timer1A_delay(0xFA0);
+           GPIO_PORTC_DATA_R = 0x00;  // Bin2: 0, Bin1: 0, Ain2: 0, Ain1: 0
+           GPIO_PORTC_DATA_R = 0x60;  // Bin2: 1, Bin1: 0, Ain2: 1, Ain1: 0  c
+           Timer1A_delay(0x7D00);
+     //      Timer1A_delay(0x30D400);
+     //      Timer1A_delay(0xFA0);
+           GPIO_PORTC_DATA_R = 0x00;  // Bin2: 0, Bin1: 0, Ain2: 0, Ain1: 0
+           GPIO_PORTC_DATA_R = 0xA0;  // Bin2: 1, Bin1: 0, Ain2: 0, Ain1: 1  9
+           Timer1A_delay(0x7D00);
+     //      Timer1A_delay(0x30D400);
+     //      Timer1A_delay(0xFA0);
+           GPIO_PORTC_DATA_R = 0x00; }
 }
 
 int Read_ADC(void) {
@@ -292,7 +297,7 @@ int Read_ADC(void) {
 
 void Timer0A_Handler(void)
 {
- Disable_Interrupts();
+//    Turn_Motor_Fwd(100);
 // brightness = Read_ADC();
 // insert motor control code here ***
 // The motor control code doesn’t have to be complicated.  Pick a range of rotation between 90 and 180
@@ -321,12 +326,48 @@ void Timer0A_Handler(void)
  //     Turn_Motor_Bkwd(4);
  // else
      // printf("do nothing\n");
+     ADC_Sample = ADC0_InSeq3();
+     setting = ceil(ADC_Sample / 4.10);
+     printf("Setting %d\n", setting);
+     GPIO_PORTF_DATA_R = 0x00;
 
- Turn_Motor_Fwd(1);
+     if ((int)setting < 18) // blue
+     {
+         GPIO_PORTF_DATA_R = 0x00;
+         GPIO_PORTF_DATA_R = 0x04;
+ //        Timer1A_delay(0x007A1200);
+//         Timer1A_delay(0x00F42400);
+         Turn_Motor_Fwd(100);
+     }
+     else if((int)setting > 75) // red
+     {
+         GPIO_PORTF_DATA_R = 0x00;
+             GPIO_PORTF_DATA_R = 0x02;
+ //            Turn_Motor_Fwd(10);
+ //            Timer1A_delay(0x007A1200);
+//             Timer1A_delay(0x00F42400);
+             Turn_Motor_Bkwd(100);
+     }
+     else //green
+     {
+         GPIO_PORTF_DATA_R = 0x00;
+             GPIO_PORTF_DATA_R = 0x08;
+ //            Turn_Motor_Fwd(10);
+ //            Timer1A_delay(0x007A1200);
+//             Timer1A_delay(0x00F42400);
+     }
 
+     GPIO_PORTF_DATA_R = 0x00;
+ //    ADC_Sample = ADC0_InSeq3();
+ //    setting = ceil(ADC_Sample / 4.10);
+ //    printf("Setting %d\n", setting);
+ //    setting = ceil(ADC_Sample / 41.0);
+ //    printf("Setting: %d%", setting);
 
- TIMER0_ICR_R = 0x00000001;  // Clear flags in GPTMRIS and GPTMMIS
- Enable_Interrupts();
+//     Timer1A_delay(0x00061A80);
+
+     TIMER0_ICR_R = 0x00000001;  // Clear flags in GPTMRIS and GPTMMIS
+//     Enable_Interrupts();
 }
 
 

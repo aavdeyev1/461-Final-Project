@@ -10,7 +10,8 @@ int timer_value1;
 int timer_value2;
 char str_setting[20];
 int brightness;
-int NUM_TURNS = 10;
+int NUM_TURNS = 5;
+int MAX_TURNS = 5;
 //#define delay1      (*((volatile unsigned long *)0x00F550C8))
 
 //volatile uint32_t delay1 = 0xF550C8;
@@ -45,45 +46,38 @@ uint32_t ADC0_InSeq3(void)
 
 void SysTick_Handler(void)// Can remove highlighted lines because there’s Nested Vectored Interrupts that’ll handle it
 {
-    ADC_Sample = ADC0_InSeq3();
-    setting = ceil(ADC_Sample / 4.10);
-    printf("Setting %d\n", setting);
-    GPIO_PORTF_DATA_R = 0x00;
-
-    if ((int)setting < 20) // blue
-    {
-        GPIO_PORTF_DATA_R = 0x00;
-        GPIO_PORTF_DATA_R = 0x04;
-//        Timer1A_delay(0x007A1200);
-        Timer1A_delay(0x00F42400);
-//        Turn_Motor_Fwd(10);
-    }
-    else if((int)setting > 90) // red
-    {
-        GPIO_PORTF_DATA_R = 0x00;
-            GPIO_PORTF_DATA_R = 0x02;
-//            Turn_Motor_Fwd(10);
-//            Timer1A_delay(0x007A1200);
-            Timer1A_delay(0x00F42400);
-//            Turn_Motor_Fwd(10);
-    }
-    else //green
-    {
-        GPIO_PORTF_DATA_R = 0x00;
-            GPIO_PORTF_DATA_R = 0x08;
-//            Turn_Motor_Fwd(10);
-//            Timer1A_delay(0x007A1200);
-            Timer1A_delay(0x00F42400);
-    }
-
-    GPIO_PORTF_DATA_R = 0x00;
 //    ADC_Sample = ADC0_InSeq3();
 //    setting = ceil(ADC_Sample / 4.10);
 //    printf("Setting %d\n", setting);
-//    setting = ceil(ADC_Sample / 41.0);
-//    printf("Setting: %d%", setting);
+//    GPIO_PORTF_DATA_R = 0x00;
+//
+//    else if ((int)setting < 18) // blue
+//    {
+//    if (NUM_TURNS > 0) { // only turn the motor if there are still turns left
+//            GPIO_PORTF_DATA_R = 0x00;
+//            GPIO_PORTF_DATA_R = 0x04;
+//            Turn_Motor_Fwd(NUM_TURNS);
+//    }
+//    }
+//    else if((int)setting > 75) // red
+//    {
+//    if (NUM_TURNS < 0) { // only turn the motor if there are still turns left
+//            GPIO_PORTF_DATA_R = 0x00;
+//            GPIO_PORTF_DATA_R = 0x02;
+//            Turn_Motor_Bkwd(NUM_TURNS);
+//    }
+//    }
+//    else //green
+//    {
+//        GPIO_PORTF_DATA_R = 0x00;
+//            GPIO_PORTF_DATA_R = 0x08;
+//    }
+//
+//    GPIO_PORTF_DATA_R = 0x00;
+//
+//    TIMER0_ICR_R = 0x00000001;  // Clear flags in GPTMRIS and GPTMMIS
+//}
 
-    Timer1A_delay(0x00061A80);
 }
 
 void Config_ADC(void)
@@ -214,6 +208,7 @@ void Timer1A_delay(unsigned long delay)
 
 void Turn_Motor_Fwd(int turns)
 {
+    NUM_TURNS = NUM_TURNS - 1;
  int i = 0;
  for(i=1; i <= turns; i++)
  {
@@ -254,6 +249,7 @@ void Turn_Motor_Fwd(int turns)
 
 void Turn_Motor_Bkwd(int turns)
 {
+    NUM_TURNS = NUM_TURNS + 1;
  int i = 0;
  for(i=1; i <= turns; i++) {
      GPIO_PORTC_DATA_R = 0x90;  // Bin2: 0, Bin1: 1, Ain2: 0, Ain1: 1 3
@@ -326,48 +322,37 @@ void Timer0A_Handler(void)
  //     Turn_Motor_Bkwd(4);
  // else
      // printf("do nothing\n");
-     ADC_Sample = ADC0_InSeq3();
-     setting = ceil(ADC_Sample / 4.10);
-     printf("Setting %d\n", setting);
-     GPIO_PORTF_DATA_R = 0x00;
+    ADC_Sample = ADC0_InSeq3();
+    setting = ceil(ADC_Sample / 4.10);
+    printf("Setting %d\n", setting);
+    GPIO_PORTF_DATA_R = 0x00;
 
-     if ((int)setting < 18) // blue
-     {
-         GPIO_PORTF_DATA_R = 0x00;
-         GPIO_PORTF_DATA_R = 0x04;
- //        Timer1A_delay(0x007A1200);
-//         Timer1A_delay(0x00F42400);
-         Turn_Motor_Fwd(100);
-     }
-     else if((int)setting > 75) // red
-     {
-         GPIO_PORTF_DATA_R = 0x00;
-             GPIO_PORTF_DATA_R = 0x02;
- //            Turn_Motor_Fwd(10);
- //            Timer1A_delay(0x007A1200);
-//             Timer1A_delay(0x00F42400);
-             Turn_Motor_Bkwd(100);
-     }
-     else //green
-     {
-         GPIO_PORTF_DATA_R = 0x00;
-             GPIO_PORTF_DATA_R = 0x08;
- //            Turn_Motor_Fwd(10);
- //            Timer1A_delay(0x007A1200);
-//             Timer1A_delay(0x00F42400);
-     }
+    if ((int)setting < 18) // blue
+    {
+        if (NUM_TURNS > 0) { // only turn the motor if there are still turns left
+            GPIO_PORTF_DATA_R = 0x00;
+            GPIO_PORTF_DATA_R = 0x04;
+            Turn_Motor_Fwd(50);
+        }
+    }
+    else if((int)setting > 75) // red
+    {
+    if (NUM_TURNS < MAX_TURNS) { // only turn the motor if there are still turns left
+            GPIO_PORTF_DATA_R = 0x00;
+            GPIO_PORTF_DATA_R = 0x02;
+            Turn_Motor_Bkwd(50);
+    }
+    }
+    else //green
+    {
+        GPIO_PORTF_DATA_R = 0x00;
+            GPIO_PORTF_DATA_R = 0x08;
+    }
 
-     GPIO_PORTF_DATA_R = 0x00;
- //    ADC_Sample = ADC0_InSeq3();
- //    setting = ceil(ADC_Sample / 4.10);
- //    printf("Setting %d\n", setting);
- //    setting = ceil(ADC_Sample / 41.0);
- //    printf("Setting: %d%", setting);
+    GPIO_PORTF_DATA_R = 0x00;
 
-//     Timer1A_delay(0x00061A80);
+    TIMER0_ICR_R = 0x00000001;  // Clear flags in GPTMRIS and GPTMMIS
 
-     TIMER0_ICR_R = 0x00000001;  // Clear flags in GPTMRIS and GPTMMIS
-//     Enable_Interrupts();
 }
 
 
